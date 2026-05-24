@@ -21,7 +21,7 @@ import Flower from '../assets/figma/puja/flower.svg';
 import PinNeed from '../assets/figma/puja/pin-need.svg';
 import PinSetup from '../assets/figma/puja/pin-setup.svg';
 
-const ganeshaBg = require('../assets/figma/ganesha-bg.png') as ImageSourcePropType;
+const bgHall = require('../assets/figma/puja/bg-hall.png') as ImageSourcePropType;
 const navDiya = require('../assets/figma/nav-diya.png') as ImageSourcePropType;
 const sprite = require('../assets/figma/puja/sprite.png') as ImageSourcePropType;
 const diagram = require('../assets/figma/puja/diagram.png') as ImageSourcePropType;
@@ -181,10 +181,10 @@ export default function PujaGuideScreen({
 
   return (
     <View style={[styles.root, { width, height }]}>
-      {/* Background deity image (node 129:7470, image 29) framed exactly as the artifact */}
+      {/* Background image (node 129:7470, image 29) framed exactly as the artifact */}
       <View style={{ position: 'absolute', top: s(-96), left: 0, width, height: s(781.8), overflow: 'hidden' }}>
         <Image
-          source={ganeshaBg}
+          source={bgHall}
           resizeMode="cover"
           style={{ position: 'absolute', top: s(16.7), left: 0, width, height: s(929) }}
         />
