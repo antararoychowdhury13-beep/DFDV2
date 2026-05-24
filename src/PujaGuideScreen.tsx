@@ -181,15 +181,17 @@ export default function PujaGuideScreen({
 
   return (
     <View style={[styles.root, { width, height }]}>
-      {/* Background deity image fading into cream */}
-      <Image
-        source={ganeshaBg}
-        resizeMode="cover"
-        style={{ position: 'absolute', top: s(-96), left: 0, width, height: s(781.8) }}
-      />
+      {/* Background deity image (node 129:7470, image 29) framed exactly as the artifact */}
+      <View style={{ position: 'absolute', top: s(-96), left: 0, width, height: s(781.8), overflow: 'hidden' }}>
+        <Image
+          source={ganeshaBg}
+          resizeMode="cover"
+          style={{ position: 'absolute', top: s(16.7), left: 0, width, height: s(929) }}
+        />
+      </View>
       <LinearGradient
         colors={['rgba(250,240,227,0)', C.cream]}
-        style={{ position: 'absolute', top: s(330), left: 0, width, height: s(360) }}
+        style={{ position: 'absolute', top: s(356), left: 0, width, height: s(192) }}
       />
 
       <ScrollView
