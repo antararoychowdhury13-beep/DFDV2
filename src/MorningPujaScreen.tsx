@@ -80,7 +80,7 @@ function NavItem({
   );
 }
 
-export default function MorningPujaScreen() {
+export default function MorningPujaScreen({ onOpenGuide }: { onOpenGuide?: () => void }) {
   const { width } = useWindowDimensions();
   const scale = width / DESIGN_WIDTH;
   const s = (n: number) => n * scale;
@@ -144,6 +144,7 @@ export default function MorningPujaScreen() {
             Offer light gratitude and peace into your day
           </Text>
           <Pressable
+            onPress={onOpenGuide}
             style={[
               styles.beginButton,
               { borderRadius: s(100), paddingHorizontal: s(16), height: s(34) },
@@ -289,11 +290,12 @@ export default function MorningPujaScreen() {
         </View>
 
         {/* Center diya */}
-        <Image
-          source={navDiya}
-          resizeMode="contain"
+        <Pressable
+          onPress={onOpenGuide}
           style={[styles.centerDiya, { width: s(100), height: s(100), left: s(405 / 2 - 50), top: s(-12) }]}
-        />
+        >
+          <Image source={navDiya} resizeMode="contain" style={{ width: '100%', height: '100%' }} />
+        </Pressable>
       </View>
     </View>
   );
