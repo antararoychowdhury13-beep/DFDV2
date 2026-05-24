@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, DESIGN_WIDTH, DESIGN_HEIGHT } from './theme';
-import { ArrowLeftIcon, BellIcon, PauseIcon, CenterDiya } from './icons';
+import { ArrowLeftIcon, BellIcon, PauseIcon } from './icons';
 import IconMandir from '../assets/figma/icon-mandir.svg';
 import IconSadhana from '../assets/figma/icon-sadhana.svg';
 import IconSeek1 from '../assets/figma/icon-seek1.svg';
@@ -19,6 +19,7 @@ import IconFire from '../assets/figma/icon-fire.svg';
 
 const ganeshaBg = require('../assets/figma/ganesha-bg.png') as ImageSourcePropType;
 const diyaCardImg = require('../assets/figma/diya-card.jpg') as ImageSourcePropType;
+const navDiya = require('../assets/figma/nav-diya.png') as ImageSourcePropType;
 
 // Waveform bar heights (px on the 440 artboard), taken directly from Figma.
 const WAVEFORM = [
@@ -39,17 +40,23 @@ function RoundIconButton({
     <Pressable
       style={[
         styles.roundButton,
-        {
-          left: s(left),
-          top: s(24),
-          width: s(36),
-          height: s(36),
-          borderRadius: s(18),
-          borderWidth: Math.max(1, s(1.5)),
-        },
+        { left: s(left), top: s(24), width: s(36), height: s(36), borderRadius: s(18) },
       ]}
     >
-      {children}
+      <View
+        style={{
+          position: 'absolute',
+          width: s(31.5),
+          height: s(31.5),
+          borderRadius: s(15.75),
+          backgroundColor: colors.goldGlow,
+          borderWidth: Math.max(StyleSheet.hairlineWidth, s(0.5)),
+          borderColor: colors.goldPrimary,
+        }}
+      />
+      <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
+        {children}
+      </View>
     </Pressable>
   );
 }
@@ -84,18 +91,18 @@ export default function MorningPujaScreen() {
       <Image
         source={ganeshaBg}
         resizeMode="cover"
-        style={{ position: 'absolute', top: 0, left: 0, width, height: s(600) }}
+        style={{ position: 'absolute', top: s(-52), left: 0, width, height: s(781.8) }}
       />
       <LinearGradient
         colors={['rgba(250,240,227,0)', colors.cream]}
-        style={{ position: 'absolute', top: s(400), left: 0, width, height: s(205) }}
+        style={{ position: 'absolute', top: s(399), left: 0, width, height: s(191) }}
       />
 
       {/* Top buttons */}
       <RoundIconButton s={s} left={16}>
         <ArrowLeftIcon size={s(20)} />
       </RoundIconButton>
-      <RoundIconButton s={s} left={388}>
+      <RoundIconButton s={s} left={384}>
         <BellIcon size={s(20)} />
       </RoundIconButton>
 
@@ -124,7 +131,7 @@ export default function MorningPujaScreen() {
         <Image
           source={diyaCardImg}
           resizeMode="cover"
-          style={{ position: 'absolute', top: 0, left: 0, width: s(385), height: s(154), borderRadius: s(21) }}
+          style={{ position: 'absolute', top: 0, left: 0, width: s(425), height: s(154) }}
         />
         <View style={[styles.diyaContent, { left: s(134), top: s(23), width: s(238), height: s(116) }]}>
           <View style={styles.diyaTitleRow}>
@@ -223,18 +230,30 @@ export default function MorningPujaScreen() {
         <Text style={[styles.quoteText, { fontSize: s(12), lineHeight: s(15), left: s(44), top: s(14), width: s(150) }]}>
           When the heart is pure, every moment becomes worship. <Text style={{ color: colors.goldDeep }}>-Divine Within</Text>
         </Text>
-        <Image
-          source={diyaCardImg}
-          resizeMode="cover"
+        <View
           style={{
             position: 'absolute',
-            right: s(8),
-            top: s(8),
-            bottom: s(8),
-            width: s(180),
-            borderRadius: s(10),
+            right: s(3),
+            top: s(3),
+            bottom: s(3),
+            width: s(196),
+            borderRadius: s(11),
+            overflow: 'hidden',
           }}
-        />
+        >
+          <Image
+            source={diyaCardImg}
+            resizeMode="cover"
+            style={{ width: '100%', height: '100%', transform: [{ scaleX: -1 }, { scale: 1.35 }, { translateY: -s(4) }] }}
+          />
+          <LinearGradient
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            colors={[colors.goldGlow, 'rgba(253,246,235,0.5)', 'rgba(253,246,235,0)']}
+            locations={[0, 0.35, 0.7]}
+            style={StyleSheet.absoluteFill}
+          />
+        </View>
       </View>
 
       {/* Bottom navigation */}
@@ -270,9 +289,11 @@ export default function MorningPujaScreen() {
         </View>
 
         {/* Center diya */}
-        <View style={[styles.centerDiya, { width: s(84), height: s(84), left: s(405 / 2 - 42), top: s(-6) }]}>
-          <CenterDiya size={s(84)} />
-        </View>
+        <Image
+          source={navDiya}
+          resizeMode="contain"
+          style={[styles.centerDiya, { width: s(100), height: s(100), left: s(405 / 2 - 50), top: s(-12) }]}
+        />
       </View>
     </View>
   );
@@ -285,10 +306,14 @@ const styles = StyleSheet.create({
   },
   roundButton: {
     position: 'absolute',
-    backgroundColor: colors.goldGlow,
-    borderColor: colors.goldPrimary,
+    backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#7b6848',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.18,
+    shadowRadius: 3,
+    elevation: 2,
   },
   titleBlock: {
     position: 'absolute',
