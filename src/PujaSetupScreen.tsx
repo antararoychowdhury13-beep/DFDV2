@@ -387,11 +387,12 @@ export default function PujaSetupScreen({
                     <Text
                       style={{
                         position: 'absolute',
-                        top: s(78),
+                        top: s(74),
                         left: 0,
                         width: s(116),
                         textAlign: 'center',
-                        fontSize: s(14),
+                        fontSize: s(13),
+                        lineHeight: s(15),
                         color: C.secondary,
                       }}
                     >
@@ -400,11 +401,12 @@ export default function PujaSetupScreen({
                     <Text
                       style={{
                         position: 'absolute',
-                        top: s(94),
+                        top: s(90),
                         left: 0,
                         width: s(116),
                         textAlign: 'center',
-                        fontSize: s(10),
+                        fontSize: s(9),
+                        lineHeight: s(11),
                         color: C.accent,
                       }}
                     >
@@ -413,11 +415,12 @@ export default function PujaSetupScreen({
                     <Text
                       style={{
                         position: 'absolute',
-                        bottom: s(4),
+                        top: s(102),
                         left: 0,
                         width: s(116),
                         textAlign: 'center',
-                        fontSize: s(10),
+                        fontSize: s(9),
+                        lineHeight: s(11),
                         color: C.accent,
                       }}
                     >
