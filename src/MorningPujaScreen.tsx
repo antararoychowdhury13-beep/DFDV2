@@ -30,14 +30,17 @@ const WAVEFORM = [
 function RoundIconButton({
   s,
   left,
+  onPress,
   children,
 }: {
   s: (n: number) => number;
   left: number;
+  onPress?: () => void;
   children: React.ReactNode;
 }) {
   return (
     <Pressable
+      onPress={onPress}
       style={[
         styles.roundButton,
         { left: s(left), top: s(24), width: s(36), height: s(36), borderRadius: s(18) },
@@ -83,9 +86,11 @@ function NavItem({
 export default function MorningPujaScreen({
   onOpenGuide,
   onBeginPuja,
+  onOpenNotifications,
 }: {
   onOpenGuide?: () => void;
   onBeginPuja?: () => void;
+  onOpenNotifications?: () => void;
 }) {
   const { width: screenWidth } = useWindowDimensions();
   const width = Math.min(screenWidth, DESIGN_WIDTH);
@@ -109,7 +114,7 @@ export default function MorningPujaScreen({
       <RoundIconButton s={s} left={16}>
         <ArrowLeftIcon size={s(20)} />
       </RoundIconButton>
-      <RoundIconButton s={s} left={384}>
+      <RoundIconButton s={s} left={384} onPress={onOpenNotifications}>
         <BellIcon size={s(20)} />
       </RoundIconButton>
 
