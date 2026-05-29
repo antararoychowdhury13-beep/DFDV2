@@ -173,7 +173,8 @@ export default function PujaGuideScreen({
   onBack?: () => void;
   onBeginPuja?: () => void;
 }) {
-  const { width, height } = useWindowDimensions();
+  const { width: screenWidth, height } = useWindowDimensions();
+  const width = Math.min(screenWidth, DESIGN_W);
   const s = (n: number) => (n * width) / DESIGN_W;
 
   const stepLabels = ['Select Deity', 'Puja setup', 'Ritual steps', 'Mantras', 'Aarti & closing'];

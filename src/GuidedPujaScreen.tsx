@@ -252,7 +252,8 @@ function NavItem({
 }
 
 export default function GuidedPujaScreen({ onBack }: { onBack?: () => void }) {
-  const { width } = useWindowDimensions();
+  const { width: screenWidth } = useWindowDimensions();
+  const width = Math.min(screenWidth, DESIGN_W);
   const s = (n: number) => (n * width) / DESIGN_W;
 
   return (

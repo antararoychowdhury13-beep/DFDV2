@@ -87,7 +87,8 @@ export default function MorningPujaScreen({
   onOpenGuide?: () => void;
   onBeginPuja?: () => void;
 }) {
-  const { width } = useWindowDimensions();
+  const { width: screenWidth } = useWindowDimensions();
+  const width = Math.min(screenWidth, DESIGN_WIDTH);
   const scale = width / DESIGN_WIDTH;
   const s = (n: number) => n * scale;
 
