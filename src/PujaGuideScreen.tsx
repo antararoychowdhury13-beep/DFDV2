@@ -26,6 +26,7 @@ const navDiya = require('../assets/figma/nav-diya.png') as ImageSourcePropType;
 const sprite = require('../assets/figma/puja/sprite.png') as ImageSourcePropType;
 const diagram = require('../assets/figma/puja/diagram.png') as ImageSourcePropType;
 const shareIcon = require('../assets/figma/puja/share.png') as ImageSourcePropType;
+const needGrid = require('../assets/figma/puja/need-grid.png') as ImageSourcePropType;
 
 const C = {
   primary: '#3e2d1a',
@@ -285,48 +286,19 @@ export default function PujaGuideScreen({
               </Text>
             </View>
 
-            {/* What you will need card */}
+            {/* What you will need card — rendered as the exported Figma asset
+                (node 139:1640) so the 14 distinct ingredient icons match the artifact. */}
             <View
               style={[
                 styles.needCard,
-                { left: s(8), top: s(48), width: s(398), height: s(284), borderRadius: s(15) },
+                { left: s(8), top: s(48), width: s(398), height: s(284), borderRadius: s(15), overflow: 'hidden' },
               ]}
             >
-              <View style={{ position: 'absolute', left: s(8), top: s(11), flexDirection: 'row', alignItems: 'center' }}>
-                <PinNeed width={s(11)} height={s(13)} />
-                <Text style={{ marginLeft: s(8), fontSize: s(14), color: C.primary }}>What you will need</Text>
-              </View>
-              <View
-                style={{
-                  position: 'absolute',
-                  left: s(7),
-                  top: s(41),
-                  width: s(384),
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                  columnGap: s(10),
-                  rowGap: s(12),
-                }}
-              >
-                {NEED_ITEMS.map((label, i) => (
-                  <View key={i} style={{ width: s(68), height: s(66) }}>
-                    <View style={{ position: 'absolute', left: s(14), top: 0, width: s(41), height: s(41) }}>
-                      <Flower width={s(41)} height={s(41)} />
-                    </View>
-                    <Text
-                      numberOfLines={1}
-                      style={{ position: 'absolute', top: s(43), width: s(68), textAlign: 'center', fontSize: s(12), color: '#000' }}
-                    >
-                      {label}
-                    </Text>
-                    <Text
-                      style={{ position: 'absolute', top: s(58), width: s(68), textAlign: 'center', fontSize: s(10), color: C.muted }}
-                    >
-                      Essental
-                    </Text>
-                  </View>
-                ))}
-              </View>
+              <Image
+                source={needGrid}
+                resizeMode="stretch"
+                style={{ position: 'absolute', left: 0, top: 0, width: s(398), height: s(284) }}
+              />
             </View>
 
             {/* Mission row */}
@@ -458,7 +430,7 @@ export default function PujaGuideScreen({
               </Text>
             </View>
             <View style={{ marginRight: s(10) }}>
-              <Pill s={s} label="View substitute" />
+              <Pill s={s} label="See other traditions" />
             </View>
           </View>
 
