@@ -12,7 +12,7 @@
 | **What you will need** grid (14 ingredients) | `Ingredient` rows linked to chosen `PujaType` | `GET /v1/puja-types/{id}/blueprint` (returns `ingredients[]`) |
 | Each item — name + `Essential` / `If Available` | per `Ingredient` row | (in same response) |
 | Item icons (PNG / SVG) | `Ingredient.icon_url` | CDN |
-| "Mission something !" row + "View substitute" pill | static copy (today); future: tap → ingredient substitutes | (none today; flagged in `01`) |
+| "Mission something !" row + "View substitute" pill | per-ingredient `alternatives[]` (bundled in blueprint) | tap → opens a sheet rendered from `Ingredient.alternatives[]` (see `00_decisions.md` #3) |
 | Where to setup — diagram image | `PujaType.setup_diagram_url` | CDN |
 | Face Direction / Best time / Keep the space | `PujaType.setup_meta` (3 small rows) | (in blueprint response) |
 | Note: "If your home doesn't allow this exactly…" | static copy | — |

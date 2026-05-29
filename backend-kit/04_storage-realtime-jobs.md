@@ -62,6 +62,7 @@ A queue is just **a list of jobs the API drops off and a worker picks up**. The 
 | **Audio transcoding** (when admin uploads a mantra) | Admin upload | Multi-second work, no user is waiting |
 | **Chant tally rollup** (weekly stats) | Cron weekly | Analytical, not operational — see `05` |
 | **Delete-account purge** | 30 days after `deleted_at` | Lets the user change their mind |
+| **Auto-abandon stale puja sessions** | Daily cron, per user-tz, fires at local sunrise | Marks any `in_progress` `PujaSession` whose `started_at < last_sunrise` as `abandoned`. Idempotent. Supports Home's "Resume vs Begin" rule. |
 
 ### Job rules
 

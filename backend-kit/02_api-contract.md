@@ -38,7 +38,7 @@ Legend: **🔓 public** · **🔒 owner-only** · **R** read · **W** write · *
 | 🔓 R 🧊 List puja types | GET | `/v1/puja-types` | Guided Puja "Choose puja type" |
 | 🔓 R 🧊 List intentions | GET | `/v1/intentions` | Guided Puja "Set your intention" chips |
 | 🔓 R 🧊 List traditions | GET | `/v1/traditions` | Puja Guide "See other traditions" |
-| 🔓 R 🧊 Get puja blueprint | GET | `/v1/puja-types/{id}/blueprint` | One call returns: ingredients, ritual steps, recommended mantras — Puja Guide + Ritual Steps screens |
+| 🔓 R 🧊 Get puja blueprint | GET | `/v1/puja-types/{id}/blueprint` | One call returns: ingredients (each with `alternatives[]` for the substitute sheet), ritual steps, recommended mantras — Puja Guide + Ritual Steps screens |
 | 🔓 R 🧊 Today's quote | GET | `/v1/quotes/today` | Home quote card |
 | 🔓 R 🧊 Today's daily content | GET | `/v1/daily` | Home "Light the sacred Diya" card + mantra of the day |
 
@@ -48,7 +48,7 @@ Legend: **🔓 public** · **🔒 owner-only** · **R** read · **W** write · *
 
 | Window | Verb | Path | Why a screen needs it |
 |---|---|---|---|
-| 🔒 R 🔥 Get current session | GET | `/v1/me/sessions/current` | Home checks "is there a session in progress?"; Guided/Puja Guide/Ritual all resume from this |
+| 🔒 R 🔥 Get current session | GET | `/v1/me/sessions/current` | Returns the latest `in_progress` session whose `started_at >= last_sunrise(user_tz)`. Older sessions are treated as null (auto-abandoned by the daily job). Home uses this to render Resume vs Begin. |
 | 🔒 W Start session | POST | `/v1/me/sessions` | Begin Puja CTA on Home |
 | 🔒 W Update session | PATCH | `/v1/me/sessions/{id}` | Selecting deity / puja type / intentions in Guided Puja; Continue button advances `current_step` |
 | 🔒 W Complete a ritual step | POST | `/v1/me/sessions/{id}/steps/{step_id}/complete` | Ritual Steps "Start step 1" → completion |

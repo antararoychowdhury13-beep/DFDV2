@@ -19,24 +19,29 @@
 
 | File | What it covers |
 |---|---|
+| [`00_decisions.md`](./00_decisions.md) | **The locked-in answers to the six open questions** (single source of truth) |
 | [`01_data-model.md`](./01_data-model.md) | Entities (nouns) derived from all 5 screens |
 | [`02_api-contract.md`](./02_api-contract.md) | Service windows (verbs), pagination, errors |
 | [`03_auth-and-access.md`](./03_auth-and-access.md) | Phone OTP + row-level access policies |
 | [`04_storage-realtime-jobs.md`](./04_storage-realtime-jobs.md) | Storage/CDN, real-time (none), background jobs, push |
 | [`05_scalability-and-failure.md`](./05_scalability-and-failure.md) | 10x roadmap, failure budgets, two quality attributes |
 
-## Items flagged for sign-off (do not silently build)
+## Decisions confirmed ✅
 
-These come up across the per-screen twins. Decide before an engineer codes them:
+The six questions the screens forced are now decided in [`00_decisions.md`](./00_decisions.md):
 
-1. **Chant-count sync — device-only or cross-device?** Default proposal in `01`: yes, cross-device, batched.
-2. **Notification deep-link allow-list.** Confirm the destinations: `morning-puja`, `puja-session/{id}`, `quote/{id}`, `festival/{slug}`, `settings/notifications`.
-3. **"View substitute"** in Puja Guide — does it open a list of ingredient substitutes? If yes, promote to an `IngredientSubstitute` table (new noun).
-4. **Red-dot semantics on Notifications.** Unread, or just "today"?
-5. **Filter chip → tag relationship.** "Calendar" badge: is it a free-text label or a real category the user can filter by?
-6. **Resume vs Start on Home's "Begin Puja"** when a session is already in progress.
+1. Chant-count sync — **cross-device, batched** ✅
+2. Notification deep-links — **closed allow-list** ✅
+3. "View substitute" — **real substitutes list** (bundled in blueprint) ✅
+4. Red dot — **new AND unread, auto-clears after 24h** ✅
+5. Calendar badge — **visual label for now; `tags[]` schema in place for later** ✅
+6. Resume vs Start — **adaptive Home; auto-abandon at next sunrise** ✅
 
-Until the above are answered, the backend treats them with the safest default (described in each twin) and is built such that switching is a single-day change.
+All the per-screen twins and the 01/02/04 docs have been patched to reflect these.
+
+## Related product docs
+
+- [`../PRD.md`](../PRD.md) — the Antar 2.0 Product Requirements Document (vision, target users, goals, scope, feature ladder, release plan).
 
 ## Adding the next screen later (Mode B)
 

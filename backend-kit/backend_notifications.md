@@ -61,7 +61,7 @@ The Notifications screen reads `NotificationDelivery` — **not** the templates.
 
 All entities/windows already in `01` / `02`. ✅ Nothing new.
 
-## Confirm with design
+## Rules confirmed (see `00_decisions.md`)
 
-- The red dot on each new card — is it "unread" or "today"? We've assumed `unread_at IS NULL`. If it should fade after 24h regardless of read state, that's a separate flag.
-- The "Calendar" badge appears on Ekadashi Reminder + Evening Aarti — implies a category sub-tag. Today modelled as part of the template's body; if it needs to be a chip the user can filter by, promote to a `tags[]` field on the template.
+- **Red dot = new AND unread.** Client renders the dot when `read_at IS NULL AND delivered_at > now - 24h`. Tap sets `read_at`; the dot never returns. Calmer than a classic inbox.
+- **Calendar badge is a visual label.** Today the badge is design copy on the template, no filter logic attached. **However** `NotificationTemplate.tags text[]` exists from day one (default `[]`), so when a future screen needs to filter by tag we add UI only — no migration.

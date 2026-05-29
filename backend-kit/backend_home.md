@@ -11,7 +11,7 @@
 | Background deity image | `Asset` (CDN) | (none — CDN URL bundled in `daily`) |
 | Bell badge (top right) | unread notifications count | `GET /v1/me/notifications?unread_only=true&limit=1` returns total in `meta` |
 | "Light the sacred Diya" card title + image | `DailyContent.today` | `GET /v1/daily` |
-| "Begin Puja" CTA | starts a `PujaSession` | `POST /v1/me/sessions` on tap |
+| "Begin Puja" / "Resume your puja" CTA | adaptive — see rule below | `POST /v1/me/sessions` (start) or route to current session's step (resume) |
 | Mantra Chanting card: name "Om Namah Shivaya" | today's `Mantra` | `GET /v1/daily` (includes `featured_mantra`) |
 | "27/108 Chants Today" | `ChantTally(user, mantra, today)` | `GET /v1/me/chants/today` |
 | Waveform / play-pause | audio file ref | streamed from CDN URL on `Mantra.audio_url` |
@@ -32,8 +32,8 @@
 
 All entities exist already in `01`; all windows exist already in `02`. ✅ No flagged additions.
 
-## Things the screen lets us assume (good to confirm)
+## Rules confirmed (see `00_decisions.md`)
 
-- The chant counter is **per user, per day, per mantra** — confirmed by the "27/108 today" copy on Home and the "108 Mantra Japa" on Ritual Steps. Same `ChantTally` entity backs both.
-- "Begin Puja" on Home starts a **fresh** session every time, unless `/v1/me/sessions/current` already returns an in-progress one — in which case Home should hint "Resume your puja" instead. Worth checking in design.
+- **Chant counter** is per user, per day, per mantra; cross-device, batched, idempotent.
+- **Adaptive Home CTA.** If `GET /v1/me/sessions/current` returns a session, the card shows **"Resume your puja"** with the step name as primary and **"Start fresh"** as secondary (which POSTs a new session and abandons the prior). Otherwise the card shows **"Begin Puja"**. The current-session window auto-expires at the user's next sunrise — older sessions are surfaced as none.
 - The waveform is a *visualisation* of the audio file; no separate data needed.

@@ -59,14 +59,26 @@ Stack note: the live tables below assume **Postgres** (Supabase). The stack is *
 
 ---
 
-## Anything NEW or AMBIGUOUS the current screens force (flagged for sign-off)
+## Confirmed decisions baked into this model
 
-These are real choices the screens *imply* but don't fully spell out. Decide before building:
+See `00_decisions.md` for rationale. Summary of what changes here:
 
-- **Chant counts: device-only or cross-device?** Home shows "27/108 today" — does that count survive a phone change? Default proposal: yes, sync on every increment batch. Confirm.
-- **Notification deep-links.** The chevron on each notification implies a destination. List of allowed destinations should be enumerated: `morning-puja`, `puja-session/{id}`, `quote/{id}`, `festival/{slug}`, `settings/notifications`. Confirm.
-- **"Mission something !" row + "View substitute"** in Puja Guide step 2. This implies a substitution table per ingredient. Currently treated as a content row; if substitutes become tappable lists, add `IngredientSubstitute(ingredient_id, substitute_text)`.
-- **"See other traditions"** implies a tradition-comparison flow. Today the row is informational; if it opens a list, no new entity (already have `Tradition`).
+- **Chant counts are cross-device, batched.** `ChantTally` is server-authoritative; device writes batches with `client_id` for dedupe.
+- **Notification deep-links are a closed enum.** `NotificationDelivery.deep_link` ∈ `{ morning-puja, puja-session/{id}, quote/{id}, festival/{slug}, settings/notifications }`. Server validates on write.
+- **`IngredientSubstitute` is a real entity** (added below). Substitutes are bundled into the puja blueprint so no extra round-trip is needed.
+- **`NotificationTemplate.tags text[]`** ships from day one (default `[]`) so promoting the Calendar badge to a filter later is a UI change, no migration.
+- **`PujaSession.status`** includes `abandoned`. A daily job auto-abandons sessions whose `started_at < last_sunrise(user_tz)` — supports the Home screen's "Resume vs Begin" rule.
+
+### IngredientSubstitute (added)
+
+| Attribute | Type | Notes |
+|---|---|---|
+| `id` | uuid | |
+| `ingredient_id` | uuid (FK → Ingredient) | indexed |
+| `alternatives` | jsonb | array of `{ label, note? }` rendered as a sheet on tap |
+| `note` | text | overall guidance ("intention matters more than form") |
+
+Read path: `Ingredient.alternatives[]` is denormalised into the `GET /v1/puja-types/{id}/blueprint` response so the Puja Guide screen needs no extra call.
 
 ---
 
