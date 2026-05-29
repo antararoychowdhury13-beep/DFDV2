@@ -87,10 +87,16 @@ export default function MorningPujaScreen({
   onOpenGuide,
   onBeginPuja,
   onOpenNotifications,
+  onOpenBookmarks,
+  onOpenStore,
+  onOpenProfile,
 }: {
   onOpenGuide?: () => void;
   onBeginPuja?: () => void;
   onOpenNotifications?: () => void;
+  onOpenBookmarks?: () => void;
+  onOpenStore?: () => void;
+  onOpenProfile?: () => void;
 }) {
   const { width: screenWidth } = useWindowDimensions();
   const width = Math.min(screenWidth, DESIGN_WIDTH);
@@ -287,19 +293,19 @@ export default function MorningPujaScreen({
         <View style={[styles.navDivider, { left: s(320), top: s(31), height: s(47) }]} />
 
         {/* Left items */}
-        <View style={[styles.navSlot, { left: s(10), top: s(31), width: s(67), height: s(47) }]}>
+        <Pressable style={[styles.navSlot, { left: s(10), top: s(31), width: s(67), height: s(47) }]}>
           <NavItem s={s} Icon={IconMandir} label="Mandir" iconSize={28} />
-        </View>
-        <View style={[styles.navSlot, { left: s(88), top: s(31), width: s(67), height: s(47) }]}>
+        </Pressable>
+        <Pressable onPress={onOpenBookmarks} style={[styles.navSlot, { left: s(88), top: s(31), width: s(67), height: s(47) }]}>
           <NavItem s={s} Icon={IconSadhana} label="Sadhana" iconSize={26} />
-        </View>
+        </Pressable>
         {/* Right items */}
-        <View style={[styles.navSlot, { left: s(248), top: s(31), width: s(67), height: s(47) }]}>
-          <NavItem s={s} Icon={IconSeek1} label="Seek" iconSize={26} />
-        </View>
-        <View style={[styles.navSlot, { left: s(326), top: s(31), width: s(67), height: s(47) }]}>
-          <NavItem s={s} Icon={IconSeek2} label="Seek" iconSize={26} />
-        </View>
+        <Pressable onPress={onOpenStore} style={[styles.navSlot, { left: s(248), top: s(31), width: s(67), height: s(47) }]}>
+          <NavItem s={s} Icon={IconSeek1} label="Store" iconSize={26} />
+        </Pressable>
+        <Pressable onPress={onOpenProfile} style={[styles.navSlot, { left: s(326), top: s(31), width: s(67), height: s(47) }]}>
+          <NavItem s={s} Icon={IconSeek2} label="Profile" iconSize={26} />
+        </Pressable>
 
         {/* Center diya */}
         <Pressable
