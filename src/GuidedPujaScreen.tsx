@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -251,10 +251,27 @@ function NavItem({
   );
 }
 
-export default function GuidedPujaScreen({ onBack }: { onBack?: () => void }) {
+export default function GuidedPujaScreen({
+  onBack,
+  onContinue,
+}: {
+  onBack?: () => void;
+  onContinue?: () => void;
+}) {
   const { width: screenWidth } = useWindowDimensions();
   const width = Math.min(screenWidth, DESIGN_W);
   const s = (n: number) => (n * width) / DESIGN_W;
+
+  const [deityIdx, setDeityIdx] = useState(0);
+  const [pujaIdx, setPujaIdx] = useState(0);
+  const [intentions, setIntentions] = useState<Set<number>>(new Set());
+  const toggleIntention = (i: number) =>
+    setIntentions((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
 
   return (
     <View style={[styles.root, { width, flex: 1 }]}>
@@ -310,10 +327,11 @@ export default function GuidedPujaScreen({ onBack }: { onBack?: () => void }) {
             </Text>
             <View style={{ position: 'absolute', left: s(15), top: s(44), width: s(385), gap: s(8) }}>
               {DEITIES.map((d, i) => {
-                const selected = i === 0;
+                const selected = i === deityIdx;
                 return (
-                  <View
+                  <Pressable
                     key={d.name}
+                    onPress={() => setDeityIdx(i)}
                     style={[
                       styles.deityRow,
                       {
@@ -340,7 +358,7 @@ export default function GuidedPujaScreen({ onBack }: { onBack?: () => void }) {
                     <View style={{ position: 'absolute', right: s(8), top: s(22) }}>
                       <Chevron width={s(24)} height={s(24)} />
                     </View>
-                  </View>
+                  </Pressable>
                 );
               })}
             </View>
@@ -358,11 +376,12 @@ export default function GuidedPujaScreen({ onBack }: { onBack?: () => void }) {
             </Text>
             {/* 3 cards */}
             {PUJA_TYPES.map((p, i) => {
-              const selected = i === 0;
+              const selected = i === pujaIdx;
               const cardLeft = [22, 151, 280][i];
               return (
-                <View
+                <Pressable
                   key={p.name}
+                  onPress={() => setPujaIdx(i)}
                   style={{
                     position: 'absolute',
                     left: s(cardLeft),
@@ -384,7 +403,7 @@ export default function GuidedPujaScreen({ onBack }: { onBack?: () => void }) {
                   <Text style={{ position: 'absolute', top: s(59), width: s(120), textAlign: 'center', fontSize: s(14), color: C.secondary }}>{p.name}</Text>
                   <Text style={{ position: 'absolute', top: s(79), width: s(120), textAlign: 'center', fontSize: s(10), color: C.accent }}>{p.sub}</Text>
                   <Text style={{ position: 'absolute', top: s(96), width: s(120), textAlign: 'center', fontSize: s(10), color: C.accent }}>{p.time}</Text>
-                </View>
+                </Pressable>
               );
             })}
           </View>
@@ -411,16 +430,19 @@ export default function GuidedPujaScreen({ onBack }: { onBack?: () => void }) {
                 columnGap: s(8),
               }}
             >
-              {INTENTS.map((it, idx) => (
-                <View
+              {INTENTS.map((it, idx) => {
+                const selected = intentions.has(idx);
+                return (
+                <Pressable
                   key={idx}
+                  onPress={() => toggleIntention(idx)}
                   style={{
                     width: s(120),
                     height: s(40),
                     borderRadius: s(8),
-                    borderWidth: 0.5,
-                    borderColor: C.goldPrimary,
-                    backgroundColor: C.card,
+                    borderWidth: selected ? 1 : 0.5,
+                    borderColor: selected ? C.goldDeep : C.goldPrimary,
+                    backgroundColor: selected ? C.goldGlow : C.card,
                     flexDirection: 'row',
                     alignItems: 'center',
                     paddingLeft: s(5.3),
@@ -441,8 +463,9 @@ export default function GuidedPujaScreen({ onBack }: { onBack?: () => void }) {
                       </Text>
                     ))}
                   </View>
-                </View>
-              ))}
+                </Pressable>
+                );
+              })}
             </View>
           </View>
 
@@ -466,7 +489,7 @@ export default function GuidedPujaScreen({ onBack }: { onBack?: () => void }) {
 
           {/* Action button */}
           <Pressable
-            onPress={onBack}
+            onPress={onContinue ?? onBack}
             style={[
               styles.actionButton,
               { width: s(417), height: s(47), borderRadius: s(12) },
@@ -501,18 +524,18 @@ export default function GuidedPujaScreen({ onBack }: { onBack?: () => void }) {
           />
           <View style={[styles.navDivider, { left: s(82), top: s(31), height: s(47) }]} />
           <View style={[styles.navDivider, { left: s(320), top: s(31), height: s(47) }]} />
-          <View style={[styles.navSlot, { left: s(10), top: s(31), width: s(67), height: s(47) }]}>
+          <Pressable onPress={onBack} style={[styles.navSlot, { left: s(10), top: s(31), width: s(67), height: s(47) }]}>
             <NavItem s={s} Icon={IconMandir} label="Mandir" iconSize={28} />
-          </View>
-          <View style={[styles.navSlot, { left: s(88), top: s(31), width: s(67), height: s(47) }]}>
+          </Pressable>
+          <Pressable style={[styles.navSlot, { left: s(88), top: s(31), width: s(67), height: s(47) }]}>
             <NavItem s={s} Icon={IconSadhana} label="Sadhana" iconSize={26} />
-          </View>
-          <View style={[styles.navSlot, { left: s(248), top: s(31), width: s(67), height: s(47) }]}>
+          </Pressable>
+          <Pressable style={[styles.navSlot, { left: s(248), top: s(31), width: s(67), height: s(47) }]}>
             <NavItem s={s} Icon={IconSeek1} label="Seek" iconSize={26} />
-          </View>
-          <View style={[styles.navSlot, { left: s(326), top: s(31), width: s(67), height: s(47) }]}>
+          </Pressable>
+          <Pressable style={[styles.navSlot, { left: s(326), top: s(31), width: s(67), height: s(47) }]}>
             <NavItem s={s} Icon={IconSeek2} label="Seek" iconSize={26} />
-          </View>
+          </Pressable>
           <Image
             source={navDiya}
             resizeMode="contain"
