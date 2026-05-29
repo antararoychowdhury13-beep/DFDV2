@@ -80,7 +80,13 @@ function NavItem({
   );
 }
 
-export default function MorningPujaScreen({ onOpenGuide }: { onOpenGuide?: () => void }) {
+export default function MorningPujaScreen({
+  onOpenGuide,
+  onBeginPuja,
+}: {
+  onOpenGuide?: () => void;
+  onBeginPuja?: () => void;
+}) {
   const { width } = useWindowDimensions();
   const scale = width / DESIGN_WIDTH;
   const s = (n: number) => n * scale;
@@ -144,7 +150,7 @@ export default function MorningPujaScreen({ onOpenGuide }: { onOpenGuide?: () =>
             Offer light gratitude and peace into your day
           </Text>
           <Pressable
-            onPress={onOpenGuide}
+            onPress={onBeginPuja}
             style={[
               styles.beginButton,
               { borderRadius: s(100), paddingHorizontal: s(16), height: s(34) },
