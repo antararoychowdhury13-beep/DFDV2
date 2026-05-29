@@ -10,32 +10,29 @@ import RitualStepsScreen from './src/RitualStepsScreen';
 type Screen = 'home' | 'guide' | 'guided' | 'notifications' | 'ritual';
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('home');
+  const [history, setHistory] = useState<Screen[]>(['home']);
+  const screen = history[history.length - 1];
+  const push = (s: Screen) => setHistory((h) => [...h, s]);
+  const back = () => setHistory((h) => (h.length > 1 ? h.slice(0, -1) : h));
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
       {screen === 'home' && (
         <MorningPujaScreen
-          onOpenGuide={() => setScreen('guide')}
-          onBeginPuja={() => setScreen('guided')}
-          onOpenNotifications={() => setScreen('notifications')}
-        />
-      )}
-      {screen === 'guide' && (
-        <PujaGuideScreen
-          onBack={() => setScreen('home')}
-          onBeginPuja={() => setScreen('ritual')}
+          onOpenGuide={() => push('guide')}
+          onBeginPuja={() => push('guided')}
+          onOpenNotifications={() => push('notifications')}
         />
       )}
       {screen === 'guided' && (
-        <GuidedPujaScreen
-          onBack={() => setScreen('home')}
-          onContinue={() => setScreen('ritual')}
-        />
+        <GuidedPujaScreen onBack={back} onContinue={() => push('guide')} />
       )}
-      {screen === 'notifications' && <NotificationsScreen onBack={() => setScreen('home')} />}
-      {screen === 'ritual' && <RitualStepsScreen onBack={() => setScreen('home')} />}
+      {screen === 'guide' && (
+        <PujaGuideScreen onBack={back} onBeginPuja={() => push('ritual')} />
+      )}
+      {screen === 'notifications' && <NotificationsScreen onBack={back} />}
+      {screen === 'ritual' && <RitualStepsScreen onBack={back} />}
     </View>
   );
 }
