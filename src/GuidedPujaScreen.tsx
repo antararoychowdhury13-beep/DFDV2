@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  TextInput,
+  Modal,
   useWindowDimensions,
   ImageSourcePropType,
 } from 'react-native';
@@ -144,15 +146,82 @@ function ProgressBar({ s, active }: { s: (n: number) => number; active: number }
   );
 }
 
-// ---- Deity rows ----
-const DEITIES: { name: string; tag: string; desc: string; top: number }[] = [
-  { name: 'Lord Ganesha', tag: 'Vighnaharta', desc: 'Remover of obstacles and bestower of wisdom', top: -3.3554 },
-  { name: 'Lord Shiva', tag: '', desc: 'The Auspicious One - Destroyer of ego and transformer of the universe.', top: -4.4283 },
-  { name: 'Goddess Lakshmi', tag: 'Goddess of Prosperity', desc: 'Bestower of wealth, abundance and wellbeing.', top: -5.5038 },
-  { name: 'Lord Vishnu', tag: 'Preserver of Dharma', desc: 'Sustainer of the universe and protector of dharma.', top: -6.6118 },
-  { name: 'Lord Krishna', tag: 'The Divine Beloved', desc: 'Embodiment of love, wisdom and divine play.', top: -7.6993 },
-];
-const DEITY_CROP_BASE = { w: 4.4857, h: 15.6646, left: -0.3238 };
+// Deities (100, sourced from data file)
+import { DEITIES, DEITY_PORTRAIT_CROP as DEITY_CROP_BASE, type Deity } from './deities';
+
+/** A deity portrait — sprite-cropped where we have one, stylised initial otherwise. */
+function DeityPortrait({ s, d, w, h }: { s: (n: number) => number; d: Deity; w: number; h: number }) {
+  if (d.portraitTop !== undefined) {
+    return (
+      <View style={{ width: w, height: h, borderRadius: s(6), overflow: 'hidden' }}>
+        <Sprite
+          source={require('../assets/figma/guided/deities.png')}
+          W={w}
+          H={h}
+          crop={{ w: DEITY_CROP_BASE.w, h: DEITY_CROP_BASE.h, left: DEITY_CROP_BASE.left, top: d.portraitTop }}
+        />
+      </View>
+    );
+  }
+  // Placeholder: warm gold tile with first glyph of the deity's name (after honorifics).
+  const cleaned = d.name.replace(/^(Lord|Maa|Goddess|Sri|Bhagwan)\s+/i, '').trim();
+  const glyph = cleaned.charAt(0).toUpperCase() || 'ॐ';
+  return (
+    <View
+      style={{
+        width: w,
+        height: h,
+        borderRadius: s(6),
+        backgroundColor: C.goldGlow,
+        borderWidth: 0.5,
+        borderColor: C.goldLight,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Text style={{ fontSize: Math.min(w, h) * 0.55, color: C.accent, fontWeight: '600' }}>{glyph}</Text>
+    </View>
+  );
+}
+
+function DeityRow({ s, d, selected, onPress }: { s: (n: number) => number; d: Deity; selected?: boolean; onPress?: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: s(68),
+        borderRadius: s(8),
+        backgroundColor: C.card,
+        borderWidth: selected ? 1 : 0.5,
+        borderColor: selected ? C.goldPrimary : 'rgba(225,155,70,0.25)',
+        paddingHorizontal: s(8),
+        shadowColor: 'rgba(225,155,70,0.3)',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 1,
+        shadowRadius: 3.7,
+        elevation: 2,
+      }}
+    >
+      <DeityPortrait s={s} d={d} w={s(58)} h={s(58)} />
+      <View style={{ flex: 1, marginLeft: s(10), marginRight: s(6) }}>
+        <Text style={{ fontSize: s(14), fontWeight: '500', color: C.primary, lineHeight: s(16) }} numberOfLines={1}>
+          {d.name}
+        </Text>
+        {d.tag ? (
+          <Text style={{ fontSize: s(10), color: C.accent, lineHeight: s(13) }} numberOfLines={1}>
+            {d.tag}
+          </Text>
+        ) : null}
+        <Text style={{ fontSize: s(9), color: C.secondary, lineHeight: s(12) }} numberOfLines={2}>
+          {d.desc}
+        </Text>
+      </View>
+      <Chevron width={s(20)} height={s(20)} />
+    </Pressable>
+  );
+}
 
 // ---- Puja types ----
 const PUJA_TYPES = [
@@ -265,6 +334,18 @@ export default function GuidedPujaScreen({
   const [deityIdx, setDeityIdx] = useState(0);
   const [pujaIdx, setPujaIdx] = useState(0);
   const [intentions, setIntentions] = useState<Set<number>>(new Set());
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const filteredDeities = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return DEITIES;
+    return DEITIES.filter(
+      (d) =>
+        d.name.toLowerCase().includes(q) ||
+        d.tag.toLowerCase().includes(q) ||
+        d.desc.toLowerCase().includes(q),
+    );
+  }, [query]);
   const toggleIntention = (i: number) =>
     setIntentions((prev) => {
       const next = new Set(prev);
@@ -311,57 +392,44 @@ export default function GuidedPujaScreen({
             </View>
           </View>
 
-          {/* Select Deity card (1.5 px offset right inside column) */}
+          {/* Select Deity card — shows the chosen deity + opens a searchable picker for the full 100. */}
           <View
             style={[
               styles.deityCard,
-              { marginLeft: s(1.5), width: s(414), height: s(431), borderRadius: s(15) },
+              { marginLeft: s(1.5), width: s(414), borderRadius: s(15), paddingTop: s(8), paddingBottom: s(14) },
             ]}
           >
-            <View style={{ position: 'absolute', left: s(15.6), top: s(8.3), flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ paddingLeft: s(15.6), flexDirection: 'row', alignItems: 'center' }}>
               <PinDeity width={s(11.5)} height={s(13)} />
               <Text style={{ marginLeft: s(7), fontSize: s(14), color: C.primary }}>Select Deity </Text>
             </View>
-            <Text style={{ position: 'absolute', left: s(37.8), top: s(25.2), width: s(356), fontSize: s(9), lineHeight: s(13), color: C.primary }}>
-              Choose the Deity you wish to warship today
+            <Text style={{ marginLeft: s(37.8), marginTop: s(2), width: s(356), fontSize: s(9), lineHeight: s(13), color: C.primary }}>
+              Choose the Deity you wish to worship today · {DEITIES.length} available
             </Text>
-            <View style={{ position: 'absolute', left: s(15), top: s(44), width: s(385), gap: s(8) }}>
-              {DEITIES.map((d, i) => {
-                const selected = i === deityIdx;
-                return (
-                  <Pressable
-                    key={d.name}
-                    onPress={() => setDeityIdx(i)}
-                    style={[
-                      styles.deityRow,
-                      {
-                        width: s(385),
-                        height: s(68),
-                        borderRadius: s(8),
-                        borderWidth: selected ? 1 : 0,
-                        borderColor: C.goldPrimary,
-                      },
-                    ]}
-                  >
-                    <View style={{ position: 'absolute', left: s(0.95), top: s(1), width: s(107), height: s(66), borderRadius: s(6), overflow: 'hidden' }}>
-                      <Sprite source={deitySprite} W={s(107)} H={s(66)} crop={{ w: DEITY_CROP_BASE.w, h: DEITY_CROP_BASE.h, left: DEITY_CROP_BASE.left, top: d.top }} />
-                    </View>
-                    <View style={{ position: 'absolute', left: s(113.4), top: s(13) }}>
-                      <Text style={{ fontSize: s(14), fontWeight: '500', color: C.primary, lineHeight: s(15) }}>{d.name}</Text>
-                      <View style={{ marginTop: s(4) }}>
-                        {d.tag ? (
-                          <Text style={{ fontSize: s(9), color: C.primary, lineHeight: s(12) }}>{d.tag}</Text>
-                        ) : null}
-                        <Text style={{ fontSize: s(9), color: C.primary, lineHeight: s(12), width: s(235) }}>{d.desc}</Text>
-                      </View>
-                    </View>
-                    <View style={{ position: 'absolute', right: s(8), top: s(22) }}>
-                      <Chevron width={s(24)} height={s(24)} />
-                    </View>
-                  </Pressable>
-                );
-              })}
+
+            <View style={{ marginTop: s(12), marginHorizontal: s(15) }}>
+              <DeityRow s={s} d={DEITIES[deityIdx]} selected />
             </View>
+
+            <Pressable
+              onPress={() => setPickerOpen(true)}
+              style={{
+                marginTop: s(10),
+                marginHorizontal: s(15),
+                alignSelf: 'stretch',
+                height: s(36),
+                borderRadius: s(18),
+                borderWidth: 0.5,
+                borderColor: C.goldDeep,
+                backgroundColor: C.goldGlow,
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'row',
+              }}
+            >
+              <Text style={{ fontSize: s(13), color: C.accent, fontWeight: '500' }}>Change deity</Text>
+              <Text style={{ marginLeft: s(6), fontSize: s(15), color: C.accent }}>›</Text>
+            </Pressable>
           </View>
 
           {/* Choose puja type */}
@@ -504,6 +572,86 @@ export default function GuidedPujaScreen({
           </Pressable>
         </View>
       </ScrollView>
+
+      {/* Deity picker (100 deities, searchable) */}
+      <Modal visible={pickerOpen} transparent animationType="slide" onRequestClose={() => setPickerOpen(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(62,45,26,0.4)' }}>
+          <Pressable style={{ flex: 1 }} onPress={() => setPickerOpen(false)} />
+          <View
+            style={{
+              backgroundColor: C.cream,
+              borderTopLeftRadius: s(24),
+              borderTopRightRadius: s(24),
+              maxHeight: '88%',
+              paddingTop: s(12),
+              paddingHorizontal: s(16),
+              paddingBottom: s(16),
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: -2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 12,
+              elevation: 8,
+            }}
+          >
+            <View style={{ width: s(40), height: s(4), borderRadius: s(2), backgroundColor: C.goldLight, alignSelf: 'center', marginBottom: s(10) }} />
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={{ flex: 1, fontFamily: SERIF, fontSize: s(18), color: C.primary }}>Select your deity</Text>
+              <Pressable onPress={() => setPickerOpen(false)} style={{ padding: s(6) }}>
+                <Text style={{ fontSize: s(16), color: C.accent }}>Close</Text>
+              </Pressable>
+            </View>
+            <Text style={{ fontSize: s(11), color: C.secondary, marginTop: s(2) }}>
+              {filteredDeities.length} of {DEITIES.length} deities
+            </Text>
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Search by name, epithet or quality…"
+              placeholderTextColor={C.muted}
+              style={{
+                marginTop: s(10),
+                height: s(40),
+                borderRadius: s(20),
+                borderWidth: 0.5,
+                borderColor: C.goldDeep,
+                backgroundColor: C.card,
+                paddingHorizontal: s(14),
+                fontSize: s(13),
+                color: C.primary,
+              }}
+            />
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ paddingTop: s(10), paddingBottom: s(20), gap: s(8) }}
+              style={{ marginTop: s(4) }}
+            >
+              {filteredDeities.length === 0 ? (
+                <Text style={{ textAlign: 'center', color: C.secondary, fontSize: s(13), padding: s(24) }}>
+                  No deity matches "{query}". Try a different word — every name, epithet and quality is searchable.
+                </Text>
+              ) : (
+                filteredDeities.map((d) => {
+                  const idx = DEITIES.indexOf(d);
+                  return (
+                    <DeityRow
+                      key={d.no}
+                      s={s}
+                      d={d}
+                      selected={idx === deityIdx}
+                      onPress={() => {
+                        setDeityIdx(idx);
+                        setPickerOpen(false);
+                        setQuery('');
+                      }}
+                    />
+                  );
+                })
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       {/* Top buttons fixed */}
       <TopButton s={s} left={17} onPress={onBack}>
