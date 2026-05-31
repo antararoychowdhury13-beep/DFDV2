@@ -184,7 +184,59 @@ function DeityPortrait({ s, d, w, h }: { s: (n: number) => number; d: Deity; w: 
   );
 }
 
-function DeityRow({ s, d, selected, onPress }: { s: (n: number) => number; d: Deity; selected?: boolean; onPress?: () => void }) {
+/** Renders text with any match of `query` highlighted in gold. */
+function Highlighted({
+  text,
+  query,
+  style,
+  numberOfLines,
+}: {
+  text: string;
+  query: string;
+  style?: any;
+  numberOfLines?: number;
+}) {
+  if (!query) {
+    return (
+      <Text style={style} numberOfLines={numberOfLines}>
+        {text}
+      </Text>
+    );
+  }
+  const lower = text.toLowerCase();
+  const q = query.toLowerCase();
+  const idx = lower.indexOf(q);
+  if (idx === -1) {
+    return (
+      <Text style={style} numberOfLines={numberOfLines}>
+        {text}
+      </Text>
+    );
+  }
+  return (
+    <Text style={style} numberOfLines={numberOfLines}>
+      {text.slice(0, idx)}
+      <Text style={[style, { backgroundColor: 'rgba(225,155,70,0.28)', color: C.primary, fontWeight: '700' }]}>
+        {text.slice(idx, idx + q.length)}
+      </Text>
+      {text.slice(idx + q.length)}
+    </Text>
+  );
+}
+
+function DeityRow({
+  s,
+  d,
+  selected,
+  query = '',
+  onPress,
+}: {
+  s: (n: number) => number;
+  d: Deity;
+  selected?: boolean;
+  query?: string;
+  onPress?: () => void;
+}) {
   return (
     <Pressable
       onPress={onPress}
@@ -206,17 +258,26 @@ function DeityRow({ s, d, selected, onPress }: { s: (n: number) => number; d: De
     >
       <DeityPortrait s={s} d={d} w={s(58)} h={s(58)} />
       <View style={{ flex: 1, marginLeft: s(10), marginRight: s(6) }}>
-        <Text style={{ fontSize: s(14), fontWeight: '500', color: C.primary, lineHeight: s(16) }} numberOfLines={1}>
-          {d.name}
-        </Text>
+        <Highlighted
+          text={d.name}
+          query={query}
+          numberOfLines={1}
+          style={{ fontSize: s(14), fontWeight: '500', color: C.primary, lineHeight: s(16) }}
+        />
         {d.tag ? (
-          <Text style={{ fontSize: s(10), color: C.accent, lineHeight: s(13) }} numberOfLines={1}>
-            {d.tag}
-          </Text>
+          <Highlighted
+            text={d.tag}
+            query={query}
+            numberOfLines={1}
+            style={{ fontSize: s(10), color: C.accent, lineHeight: s(13) }}
+          />
         ) : null}
-        <Text style={{ fontSize: s(9), color: C.secondary, lineHeight: s(12) }} numberOfLines={2}>
-          {d.desc}
-        </Text>
+        <Highlighted
+          text={d.desc}
+          query={query}
+          numberOfLines={2}
+          style={{ fontSize: s(9), color: C.secondary, lineHeight: s(12) }}
+        />
       </View>
       <Chevron width={s(20)} height={s(20)} />
     </Pressable>
@@ -601,25 +662,81 @@ export default function GuidedPujaScreen({
               </Pressable>
             </View>
             <Text style={{ fontSize: s(11), color: C.secondary, marginTop: s(2) }}>
-              {filteredDeities.length} of {DEITIES.length} deities
+              {query
+                ? `${filteredDeities.length} match${filteredDeities.length === 1 ? '' : 'es'} for "${query}"`
+                : `Showing all ${DEITIES.length}`}
             </Text>
-            <TextInput
-              value={query}
-              onChangeText={setQuery}
-              placeholder="Search by name, epithet or quality…"
-              placeholderTextColor={C.muted}
+
+            {/* Search input with magnifying-glass affordance + live clear button */}
+            <View
               style={{
                 marginTop: s(10),
-                height: s(40),
-                borderRadius: s(20),
+                height: s(42),
+                borderRadius: s(21),
                 borderWidth: 0.5,
-                borderColor: C.goldDeep,
+                borderColor: query ? C.goldPrimary : C.goldDeep,
                 backgroundColor: C.card,
+                flexDirection: 'row',
+                alignItems: 'center',
                 paddingHorizontal: s(14),
-                fontSize: s(13),
-                color: C.primary,
               }}
-            />
+            >
+              <Text style={{ fontSize: s(14), color: query ? C.accent : C.muted, marginRight: s(8) }}>⌕</Text>
+              <TextInput
+                value={query}
+                onChangeText={setQuery}
+                placeholder='Try "Lakshmi" or "remover of obstacles"…'
+                placeholderTextColor={C.muted}
+                autoFocus
+                autoCorrect={false}
+                autoCapitalize="none"
+                returnKeyType="search"
+                style={[
+                  { flex: 1, fontSize: s(13), color: C.primary },
+                  // web-only: remove the native search outline; ignored on native.
+                  { outlineStyle: 'none' } as unknown as object,
+                ]}
+              />
+              {query.length > 0 && (
+                <Pressable
+                  onPress={() => setQuery('')}
+                  style={{
+                    width: s(22),
+                    height: s(22),
+                    borderRadius: s(11),
+                    backgroundColor: 'rgba(225,155,70,0.15)',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: s(6),
+                  }}
+                >
+                  <Text style={{ fontSize: s(12), color: C.accent, lineHeight: s(14) }}>✕</Text>
+                </Pressable>
+              )}
+            </View>
+
+            {/* Assistive suggestion chips while the input is empty. */}
+            {!query && (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: s(6), marginTop: s(10) }}>
+                {['Lakshmi', 'Shiva', 'Devi', 'Krishna', 'remover', 'prosperity'].map((seed) => (
+                  <Pressable
+                    key={seed}
+                    onPress={() => setQuery(seed)}
+                    style={{
+                      borderRadius: s(100),
+                      borderWidth: 0.5,
+                      borderColor: C.goldDeep,
+                      backgroundColor: C.goldGlow,
+                      paddingHorizontal: s(10),
+                      paddingVertical: s(4),
+                    }}
+                  >
+                    <Text style={{ fontSize: s(11), color: C.accent }}>{seed}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
+
             <ScrollView
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
@@ -627,9 +744,28 @@ export default function GuidedPujaScreen({
               style={{ marginTop: s(4) }}
             >
               {filteredDeities.length === 0 ? (
-                <Text style={{ textAlign: 'center', color: C.secondary, fontSize: s(13), padding: s(24) }}>
-                  No deity matches "{query}". Try a different word — every name, epithet and quality is searchable.
-                </Text>
+                <View style={{ padding: s(24), alignItems: 'center' }}>
+                  <Text style={{ textAlign: 'center', color: C.primary, fontSize: s(14), fontWeight: '500' }}>
+                    No deity matches "{query}"
+                  </Text>
+                  <Text style={{ textAlign: 'center', color: C.secondary, fontSize: s(11), marginTop: s(6), lineHeight: s(15) }}>
+                    Every name, epithet and quality is searchable. Try a shorter word.
+                  </Text>
+                  <Pressable
+                    onPress={() => setQuery('')}
+                    style={{
+                      marginTop: s(14),
+                      borderRadius: s(100),
+                      borderWidth: 0.5,
+                      borderColor: C.goldDeep,
+                      backgroundColor: C.goldGlow,
+                      paddingHorizontal: s(14),
+                      paddingVertical: s(6),
+                    }}
+                  >
+                    <Text style={{ fontSize: s(12), color: C.accent, fontWeight: '500' }}>Clear search</Text>
+                  </Pressable>
+                </View>
               ) : (
                 filteredDeities.map((d) => {
                   const idx = DEITIES.indexOf(d);
@@ -638,6 +774,7 @@ export default function GuidedPujaScreen({
                       key={d.no}
                       s={s}
                       d={d}
+                      query={query}
                       selected={idx === deityIdx}
                       onPress={() => {
                         setDeityIdx(idx);
