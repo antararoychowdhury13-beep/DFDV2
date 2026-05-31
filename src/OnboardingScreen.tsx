@@ -8,323 +8,169 @@ import {
   useWindowDimensions,
   ImageSourcePropType,
 } from 'react-native';
-import {
-  LotusIcon,
-  LotusDivider,
-  HandsIcon,
-  ShrineIcon,
-  ArchBellIcon,
-  SunriseIcon,
-  DiyaIcon,
-  FlowerIcon,
-  BellIcon,
-  StreakIcon,
-  ChartUpIcon,
-  JournalIcon,
-  TrophyIcon,
-  CalendarIcon,
-  ClockIcon,
-  StarIcon,
-  MalaIcon,
-  CounterIcon,
-  HeadphonesIcon,
-} from './OnboardingIcons';
 
-// Hero images — these slots use placeholder marble assets today; replace the
-// PNGs at assets/onboarding/*.png with your final AI-rendered cards and the
-// carousel picks them up with no code change.
-const HERO_01 = require('../assets/onboarding/01-mandir.png') as ImageSourcePropType;
-const HERO_02 = require('../assets/onboarding/02-guided-puja.png') as ImageSourcePropType;
-const HERO_03 = require('../assets/onboarding/03-sadhana-journey.png') as ImageSourcePropType;
-const HERO_04 = require('../assets/onboarding/04-panchang.png') as ImageSourcePropType;
-const HERO_05 = require('../assets/onboarding/05-mantra-mala.png') as ImageSourcePropType;
+// Each card is a complete Figma-rendered design (full-bleed image with title,
+// subtitle, body, feature icons, dots all baked in). Today only two slots hold
+// real Figma exports — Mandir and Divine Reminders. Replace the placeholder
+// PNGs in this folder with the matching Figma exports to upgrade the rest.
+const HERO_MANDIR = require('../assets/onboarding/mandir.png') as ImageSourcePropType;
+const HERO_REMINDERS = require('../assets/onboarding/divine-reminders.png') as ImageSourcePropType;
+const HERO_GUIDED = require('../assets/onboarding/guided-puja.png') as ImageSourcePropType;
+const HERO_SADHANA = require('../assets/onboarding/sadhana-journey.png') as ImageSourcePropType;
+const HERO_PANCHANG = require('../assets/onboarding/panchang.png') as ImageSourcePropType;
+const HERO_MANTRA = require('../assets/onboarding/mantra-mala.png') as ImageSourcePropType;
 
-// Palette — Antar premium ivory-temple onboarding spec (§4)
-const C = {
-  bg: '#F8F4ED', // ivory
-  card: '#FFF9F1', // warm cream
-  marble: '#F7F2EA',
-  gold: '#B8862F',
-  saffron: '#D69A33',
-  rosegold: '#D5A17A',
-  sand: '#E8D8BF',
-  title: '#3B2A1E',
-  body: '#4A382A',
-  taupe: '#6F5C4B',
-  white: '#FFFFFF',
-};
-const SERIF = 'Georgia, "Times New Roman", serif';
-const DESIGN_W = 430;
-
-type Feature = { Icon: React.FC<{ size: number; color?: string }>; label: string };
-type Card = {
-  hero: ImageSourcePropType;
-  title: string;
-  subtitle: string;
-  body: string;
-  features: Feature[];
-};
-
-const CARDS: Card[] = [
-  {
-    hero: HERO_01,
-    title: 'Mandir',
-    subtitle: 'Your personal digital temple',
-    body: 'Begin every day inside a sacred temple space with divine darshan, peaceful visuals, and spiritual grounding.',
-    features: [
-      { Icon: HandsIcon, label: 'Daily\ndarshan' },
-      { Icon: ShrineIcon, label: 'Personalized\ndeity altar' },
-      { Icon: ArchBellIcon, label: 'Temple\nambience' },
-      { Icon: SunriseIcon, label: 'Morning &\nevening blessings' },
-    ],
-  },
-  {
-    hero: HERO_02,
-    title: 'Guided Puja',
-    subtitle: 'Step-by-step rituals made simple',
-    body: 'Perform puja with calm guided flows designed for everyday devotion.',
-    features: [
-      { Icon: LotusIcon, label: 'Puja\nmodes' },
-      { Icon: DiyaIcon, label: 'Light\ndiya' },
-      { Icon: FlowerIcon, label: 'Offer\nflowers' },
-      { Icon: BellIcon, label: 'Ring\nbell' },
-    ],
-  },
-  {
-    hero: HERO_03,
-    title: 'Sadhana Journey',
-    subtitle: 'Build a daily spiritual habit',
-    body: 'Create consistency through sacred rituals and mindful spiritual practice.',
-    features: [
-      { Icon: StreakIcon, label: 'Daily\nstreaks' },
-      { Icon: ChartUpIcon, label: 'Habit\ntracking' },
-      { Icon: JournalIcon, label: 'Reflection\nprompts' },
-      { Icon: LotusIcon, label: 'Guided morning\nsadhana' },
-      { Icon: TrophyIcon, label: 'Spiritual\nmilestones' },
-    ],
-  },
-  {
-    hero: HERO_04,
-    title: 'Today’s Panchang,\nFestival & Muhurat',
-    subtitle: 'Sacred time, every day',
-    body: 'Accurate daily Panchang, Hindu festivals, and auspicious timings — all in one place.',
-    features: [
-      { Icon: CalendarIcon, label: 'Daily\nPanchang' },
-      { Icon: LotusIcon, label: 'Festivals\n& Vrats' },
-      { Icon: ClockIcon, label: 'Shubh\nMuhurat' },
-      { Icon: StarIcon, label: 'Personalized\nReminders' },
-    ],
-  },
-  {
-    hero: HERO_05,
-    title: 'Mantra & Jap Mala',
-    subtitle: 'Chant with focus and presence',
-    body: 'Repeat sacred mantras with immersive chanting tools.',
-    features: [
-      { Icon: MalaIcon, label: '108-bead\ndigital mala' },
-      { Icon: CounterIcon, label: 'Chant\ncounter' },
-      { Icon: HeadphonesIcon, label: 'Audio mantra\nguide' },
-      { Icon: ChartUpIcon, label: 'Progress\ntracking' },
-      { Icon: CalendarIcon, label: 'Daily mantra\nrecommendations' },
-    ],
-  },
+const CARDS: { key: string; src: ImageSourcePropType; aria: string }[] = [
+  { key: 'mandir', src: HERO_MANDIR, aria: 'Mandir — Your personal digital temple' },
+  { key: 'reminders', src: HERO_REMINDERS, aria: 'Divine Reminders — Gentle spiritual nudges' },
+  { key: 'guided', src: HERO_GUIDED, aria: 'Guided Puja — Step-by-step rituals' },
+  { key: 'sadhana', src: HERO_SADHANA, aria: 'Sadhana Journey — Build a daily spiritual habit' },
+  { key: 'panchang', src: HERO_PANCHANG, aria: 'Today’s Panchang, Festival & Muhurat' },
+  { key: 'mantra', src: HERO_MANTRA, aria: 'Mantra & Jap Mala — Chant with focus and presence' },
 ];
 
-function FeatureChip({
-  s,
-  Icon,
-  label,
-}: {
-  s: (n: number) => number;
-  Icon: React.FC<{ size: number; color?: string }>;
-  label: string;
-}) {
-  return (
-    <View style={{ alignItems: 'center', width: s(76) }}>
-      <View
-        style={{
-          width: s(54),
-          height: s(54),
-          borderRadius: s(27),
-          backgroundColor: C.marble,
-          borderWidth: 0.5,
-          borderColor: C.sand,
-          alignItems: 'center',
-          justifyContent: 'center',
-          shadowColor: '#3B2A1E',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.06,
-          shadowRadius: 6,
-          elevation: 2,
-        }}
-      >
-        <Icon size={s(28)} />
-      </View>
-      <Text
-        style={{
-          marginTop: s(6),
-          textAlign: 'center',
-          fontSize: s(11),
-          lineHeight: s(14),
-          color: C.taupe,
-        }}
-      >
-        {label}
-      </Text>
-    </View>
-  );
-}
+// Figma palette + token notes (node 203:5674)
+const C = {
+  bg: '#fbf5ef', // ivory background behind the card
+  goldDeep: '#cd934c', // Next button fill
+  goldGlow: '#fdf6eb', // Skip button fill
+  accent: '#a87647', // Skip text colour
+  white: '#ffffff',
+};
+const DESIGN_W = 440;
 
 export default function OnboardingScreen({ onFinish }: { onFinish?: () => void }) {
   const { width: screenWidth, height } = useWindowDimensions();
   const width = Math.min(screenWidth, DESIGN_W);
   const s = (n: number) => (n * width) / DESIGN_W;
   const [step, setStep] = useState(0);
-  const card = CARDS[step];
+  const prev = (step + CARDS.length - 1) % CARDS.length;
+  const next = (step + 1) % CARDS.length;
   const onLast = step === CARDS.length - 1;
 
+  // Scale the vertical Figma positions to the actual viewport height — keeps
+  // the card visually proportional on devices with different aspect ratios.
+  const verticalScale = Math.min(1, height / 956);
+  const yCard = s(158) * verticalScale;
+  const cardHeight = s(640) * verticalScale;
+  const yButton = height - s(48) * verticalScale; // bottom inset
+
   return (
-    <View style={[styles.root, { width, height, flexDirection: 'column' }]}>
-      {/* Hero — fixed 48% of screen height, with soft rounded bottom */}
-      <Image
-        source={card.hero}
-        resizeMode="cover"
-        style={{
-          width,
-          height: height * 0.48,
-          borderBottomLeftRadius: s(28),
-          borderBottomRightRadius: s(28),
-        }}
-      />
-
-      {/* Content area fills the rest, leaves room for dots + skip/next at bottom */}
-      <View
-        style={{
-          flex: 1,
-          paddingHorizontal: s(20),
-          paddingTop: s(16),
-          paddingBottom: s(80),
-          alignItems: 'center',
-        }}
-      >
-        <LotusIcon size={s(22)} />
-
-        <Text
-          style={{
-            marginTop: s(10),
-            fontFamily: SERIF,
-            fontSize: s(26),
-            lineHeight: s(31),
-            color: C.title,
-            textAlign: 'center',
-          }}
-        >
-          {card.title}
-        </Text>
-
-        <Text
-          style={{
-            marginTop: s(4),
-            fontFamily: SERIF,
-            fontSize: s(14),
-            lineHeight: s(19),
-            color: C.gold,
-            textAlign: 'center',
-          }}
-        >
-          {card.subtitle}
-        </Text>
-
-        <View style={{ marginTop: s(6) }}>
-          <LotusDivider size={s(26)} />
-        </View>
-
-        <Text
-          style={{
-            marginTop: s(6),
-            fontSize: s(12.5),
-            lineHeight: s(18),
-            color: C.body,
-            textAlign: 'center',
-            paddingHorizontal: s(8),
-          }}
-        >
-          {card.body}
-        </Text>
-
-        <View
-          style={{
-            marginTop: s(14),
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            rowGap: s(10),
-            columnGap: s(4),
-            alignSelf: 'stretch',
-          }}
-        >
-          {card.features.map((f, i) => (
-            <FeatureChip key={i} s={s} Icon={f.Icon} label={f.label} />
-          ))}
-        </View>
-      </View>
-
-      {/* Pagination dots */}
-      <View
+    <View style={[styles.root, { width, height, backgroundColor: C.bg }]}>
+      {/* Previous card peek — Figma x = -306 on a 440-wide canvas */}
+      <Pressable
+        onPress={() => setStep(prev)}
         style={{
           position: 'absolute',
-          bottom: s(56),
-          left: 0,
-          right: 0,
+          left: s(-306),
+          top: yCard,
+          width: s(340),
+          height: cardHeight,
+          borderRadius: s(32),
+          overflow: 'hidden',
+          backgroundColor: '#fff',
+        }}
+      >
+        <Image source={CARDS[prev].src} resizeMode="cover" style={{ width: '100%', height: '100%' }} />
+      </Pressable>
+
+      {/* Next card peek — Figma x = 406 */}
+      <Pressable
+        onPress={() => setStep(next)}
+        style={{
+          position: 'absolute',
+          left: s(406),
+          top: yCard,
+          width: s(340),
+          height: cardHeight,
+          borderRadius: s(32),
+          overflow: 'hidden',
+          backgroundColor: '#fff',
+        }}
+      >
+        <Image source={CARDS[next].src} resizeMode="cover" style={{ width: '100%', height: '100%' }} />
+      </Pressable>
+
+      {/* Current card centred — Figma x = 50, y = 158, 340 × 640 */}
+      <View
+        accessibilityLabel={CARDS[step].aria}
+        style={{
+          position: 'absolute',
+          left: s(50),
+          top: yCard,
+          width: s(340),
+          height: cardHeight,
+          borderRadius: s(32),
+          overflow: 'hidden',
+          backgroundColor: '#fff',
+          // soft sandstone shadow per spec
+          shadowColor: '#3B2A1E',
+          shadowOffset: { width: 0, height: 6 },
+          shadowOpacity: 0.12,
+          shadowRadius: 18,
+          elevation: 6,
+        }}
+      >
+        <Image source={CARDS[step].src} resizeMode="cover" style={{ width: '100%', height: '100%' }} />
+      </View>
+
+      {/* Skip — bottom left, 79×32, gold-glow pill with gold-deep border */}
+      <Pressable
+        onPress={onFinish}
+        style={{
+          position: 'absolute',
+          left: s(16),
+          top: yButton - s(32),
+          width: s(79),
+          height: s(32),
+          borderRadius: s(100),
+          borderWidth: 0.5,
+          borderColor: C.goldDeep,
+          backgroundColor: C.goldGlow,
           flexDirection: 'row',
+          alignItems: 'center',
           justifyContent: 'center',
-          gap: s(7),
+          shadowColor: '#a6804d',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 6,
+          elevation: 2,
         }}
       >
-        {CARDS.map((_, i) => (
-          <Pressable key={i} onPress={() => setStep(i)} hitSlop={6}>
-            <View
-              style={{
-                width: i === step ? s(22) : s(8),
-                height: s(8),
-                borderRadius: s(4),
-                backgroundColor: i === step ? C.gold : 'rgba(184,134,47,0.25)',
-              }}
-            />
-          </Pressable>
-        ))}
-      </View>
+        <Text style={{ color: C.accent, fontSize: s(16), fontWeight: '500' }}>Skip</Text>
+        <Text style={{ color: C.accent, fontSize: s(20), marginLeft: s(4) }}>›</Text>
+      </Pressable>
 
-      {/* Skip / Next */}
-      <View
+      {/* Next — bottom right, 79×32, gold-deep fill, white text */}
+      <Pressable
+        onPress={() => (onLast ? onFinish?.() : setStep((i) => i + 1))}
         style={{
           position: 'absolute',
-          bottom: s(14),
-          left: s(24),
-          right: s(24),
+          left: s(345),
+          top: yButton - s(32),
+          width: s(79),
+          height: s(32),
+          borderRadius: s(100),
+          backgroundColor: C.goldDeep,
           flexDirection: 'row',
-          justifyContent: 'space-between',
           alignItems: 'center',
+          justifyContent: 'center',
+          shadowColor: '#a6804d',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 6,
+          elevation: 2,
         }}
       >
-        <Pressable onPress={onFinish} hitSlop={10} style={{ paddingVertical: s(8) }}>
-          <Text style={{ fontSize: s(13), color: C.taupe, letterSpacing: 0.3 }}>Skip</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => (onLast ? onFinish?.() : setStep((i) => i + 1))}
-          hitSlop={10}
-          style={{ paddingVertical: s(8), flexDirection: 'row', alignItems: 'center' }}
-        >
-          <Text style={{ fontSize: s(13), color: C.gold, fontWeight: '600', letterSpacing: 0.3 }}>
-            {onLast ? 'Enter' : 'Next'}
-          </Text>
-          <Text style={{ marginLeft: s(6), fontSize: s(15), color: C.gold }}>›</Text>
-        </Pressable>
-      </View>
+        <Text style={{ color: C.white, fontSize: s(16), fontWeight: '500' }}>
+          {onLast ? 'Enter' : 'Next'}
+        </Text>
+        <Text style={{ color: C.white, fontSize: s(20), marginLeft: s(4) }}>›</Text>
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { backgroundColor: C.bg, overflow: 'hidden' },
+  root: { overflow: 'hidden', alignSelf: 'center' },
 });
