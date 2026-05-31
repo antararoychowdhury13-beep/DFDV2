@@ -445,7 +445,8 @@ export default function GuidedPujaScreen({
       (d) =>
         d.name.toLowerCase().includes(q) ||
         d.tag.toLowerCase().includes(q) ||
-        d.desc.toLowerCase().includes(q),
+        d.desc.toLowerCase().includes(q) ||
+        d.region.toLowerCase().includes(q),
     );
   }, [query]);
   const toggleIntention = (i: number) =>
@@ -726,7 +727,7 @@ export default function GuidedPujaScreen({
               <TextInput
                 value={query}
                 onChangeText={setQuery}
-                placeholder='Try "Lakshmi" or "remover of obstacles"…'
+                placeholder='Search by name, region or quality…'
                 placeholderTextColor={C.muted}
                 autoFocus
                 autoCorrect={false}
@@ -759,7 +760,7 @@ export default function GuidedPujaScreen({
             {/* Assistive suggestion chips while the input is empty. */}
             {!query && (
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: s(6), marginTop: s(10) }}>
-                {['Lakshmi', 'Shiva', 'Devi', 'Krishna', 'remover', 'prosperity'].map((seed) => (
+                {['Lakshmi', 'Shiva', 'Krishna', 'South India', 'Shakti', 'remover'].map((seed) => (
                   <Pressable
                     key={seed}
                     onPress={() => setQuery(seed)}
