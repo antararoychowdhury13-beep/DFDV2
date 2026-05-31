@@ -224,6 +224,11 @@ function Highlighted({
   );
 }
 
+/**
+ * DeityRow — implements Figma node 161:5926 (Select deity card, Default variant).
+ * 404×68 card with a 107×66 portrait at the left, two-line text block at x=119,
+ * and a chevron-right at the far right.
+ */
 function DeityRow({
   s,
   d,
@@ -241,45 +246,81 @@ function DeityRow({
     <Pressable
       onPress={onPress}
       style={{
-        flexDirection: 'row',
-        alignItems: 'center',
+        alignSelf: 'stretch',
         height: s(68),
         borderRadius: s(8),
         backgroundColor: C.card,
-        borderWidth: selected ? 1 : 0.5,
-        borderColor: selected ? C.goldPrimary : 'rgba(225,155,70,0.25)',
-        paddingHorizontal: s(8),
+        borderWidth: selected ? 1 : 0,
+        borderColor: selected ? C.goldPrimary : undefined,
         shadowColor: 'rgba(225,155,70,0.3)',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 1,
         shadowRadius: 3.7,
         elevation: 2,
+        overflow: 'hidden',
       }}
     >
-      <DeityPortrait s={s} d={d} w={s(58)} h={s(58)} />
-      <View style={{ flex: 1, marginLeft: s(10), marginRight: s(6) }}>
+      {/* Portrait (Slot) — inset 1.47% top/bottom, 0.25% left, 73.02% right of a 404×68 card */}
+      <View
+        style={{
+          position: 'absolute',
+          left: s(1),
+          top: s(1),
+          width: s(107),
+          height: s(66),
+          borderRadius: s(6),
+          overflow: 'hidden',
+        }}
+      >
+        <DeityPortrait s={s} d={d} w={s(107)} h={s(66)} />
+      </View>
+
+      {/* Text block (Slot 3) — inset 10.29% top/bottom, 29.46% left, 11.39% right */}
+      <View
+        style={{
+          position: 'absolute',
+          left: s(119),
+          right: s(46),
+          top: s(7),
+          bottom: s(7),
+        }}
+      >
         <Highlighted
           text={d.name}
           query={query}
           numberOfLines={1}
-          style={{ fontSize: s(14), fontWeight: '500', color: C.primary, lineHeight: s(16) }}
+          style={{ fontSize: s(14), fontWeight: '500', color: C.primary, lineHeight: s(15) }}
         />
         {d.tag ? (
           <Highlighted
             text={d.tag}
             query={query}
             numberOfLines={1}
-            style={{ fontSize: s(10), color: C.accent, lineHeight: s(13) }}
+            style={{ marginTop: s(7), fontSize: s(9), color: C.primary, lineHeight: s(12) }}
           />
         ) : null}
         <Highlighted
           text={d.desc}
           query={query}
-          numberOfLines={2}
-          style={{ fontSize: s(9), color: C.secondary, lineHeight: s(12) }}
+          numberOfLines={d.tag ? 1 : 2}
+          style={{ fontSize: s(9), color: C.primary, lineHeight: s(12) }}
         />
       </View>
-      <Chevron width={s(20)} height={s(20)} />
+
+      {/* Chevron (Slot 4) — top 36.76%, right 3.96%, ~16×16 */}
+      <View
+        style={{
+          position: 'absolute',
+          top: s(22),
+          right: s(13),
+          width: s(20),
+          height: s(20),
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Chevron width={s(16)} height={s(16)} />
+      </View>
     </Pressable>
   );
 }
@@ -469,7 +510,7 @@ export default function GuidedPujaScreen({
             </Text>
 
             <View style={{ marginTop: s(12), marginHorizontal: s(15) }}>
-              <DeityRow s={s} d={DEITIES[deityIdx]} selected />
+              <DeityRow s={s} d={DEITIES[deityIdx]} selected onPress={() => setPickerOpen(true)} />
             </View>
 
             <Pressable
